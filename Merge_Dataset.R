@@ -16,7 +16,7 @@ attach(influence)
 
 # Remove useless columns
 
-influence <- influence[, -c(2,3,5,6,7)]
+influence <- influence[, -c(2,3,5)]
 head(influence)
 summary(influence)
 
