@@ -34,14 +34,7 @@ dataset <- dataset %>%
 
 dataset$date <- ymd(dataset$date)
 
-# dataset$date <- as.Date(dataset$date)
-
 # Summarize and group by month
-# 
-# dataset_new <- dataset
-# dataset_new$month <- strftime(dataset_new, )
-
-
 
 dataset_new <- dataset %>%
   group_by(month = lubridate::floor_date(date, 'month')) %>%
