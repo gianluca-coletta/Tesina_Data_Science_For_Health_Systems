@@ -37,7 +37,7 @@ dataset$date <- ymd(dataset$date)
 # Summarize and group by month
 
 dataset_new <- dataset %>%
-  group_by(month = lubridate::floor_date(date, 'month')) %>%
+  group_by(date = lubridate::floor_date(date, 'month')) %>%
   summarize(processed_samples = sum(processed_samples),
             ah1n12009 = sum(ah1n12009),
             ah3 = sum(ah3),
@@ -51,3 +51,17 @@ dataset_new <- dataset %>%
             totale_negative = sum(totale_negative))
 
 summary(dataset_new)
+
+# Add column year and month
+
+dataset_new$year <- strftime(dataset_new$date, "%Y")
+dataset_new$month <- strftime(dataset_new$date, "%m")
+
+# Reorder variable
+
+dataset_new <- dataset_new[, c(1,14,13,2,3,4,5,6,7,8,9,10,11,12)]
+
+# Convert month number to month name
+
+dataset_new$month <- month.abb[as.numeric(dataset_new$month)]
+
