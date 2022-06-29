@@ -66,6 +66,21 @@ dataset <- dataset[, c(1,14,13,2,3,4,5,6,7,8,9,10,11,12)]
 
 dataset$month <- month.abb[as.numeric(dataset$month)]
 
+# Rename month
+
+dataset$month[dataset$month == "Jan"] <- "01-January"
+dataset$month[dataset$month == "Feb"] <- "02-February"
+dataset$month[dataset$month == "Mar"] <- "03-March"
+dataset$month[dataset$month == "Apr"] <- "04-April"
+dataset$month[dataset$month == "May"] <- "05-May"
+dataset$month[dataset$month == "Jun"] <- "06-June"
+dataset$month[dataset$month == "Jul"] <- "07-July"
+dataset$month[dataset$month == "Aug"] <- "08-August"
+dataset$month[dataset$month == "Sep"] <- "09-September"
+dataset$month[dataset$month == "Oct"] <- "10-October"
+dataset$month[dataset$month == "Nov"] <- "11-November"
+dataset$month[dataset$month == "Dec"] <- "12-December"
+
 
 # Histogram of the ratio between number of positives and samples processed 
 
@@ -242,7 +257,7 @@ ks.test(dataset_pre$total_positive,pnorm,mean(dataset_pre$total_positive),sd(dat
 shapiro.test(dataset$total_positive)
 
 
-boxcox(lm(dataset_pre$total_positive~1), lambda = seq(0,10,0.1)) 
+boxcox(lm(dataset_pre$total_positive~1), lambda = seq(-10,10,0.1)) 
 title("Total positive")
 
 shapiro.test((dataset_pre$total_positive^6-1)/6)
@@ -258,7 +273,7 @@ qqline(dataset_pre$processed_samples)
 ks.test(dataset_pre$processed_samples,pnorm,mean(dataset_pre$processed_samples),sd(dataset_pre$processed_samples))
 shapiro.test(dataset_pre$processed_samples)
 
-boxcox(lm(dataset_pre$processed_samples~1), lambda = seq(0,1,0.1)) 
+boxcox(lm(dataset_pre$processed_samples~1), lambda = seq(-10,10,0.1)) 
 title("Processed samples")
 
 shapiro.test((dataset_pre$processed_samples^6-1)/6)
