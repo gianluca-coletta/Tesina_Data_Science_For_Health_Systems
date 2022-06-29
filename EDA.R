@@ -7,6 +7,7 @@ library(dplyr)
 library(lubridate)
 library(reshape2)
 require(gridExtra)
+library(MASS)
 
 # Import dataset of USA Influence report from 2017 to 2021
 
@@ -231,4 +232,37 @@ grid.arrange(plot_type_pre_year,plot_type_post_year,ncol=2)
 
 
 ###### TEST ######
+
+# Total positive pre
+
+qqnorm(dataset_pre$total_positive)
+qqline(dataset_pre$total_positive)
+
+ks.test(dataset_pre$total_positive,pnorm,mean(dataset_pre$total_positive),sd(dataset_pre$total_positive))
+shapiro.test(dataset$total_positive)
+
+
+boxcox(lm(dataset_pre$total_positive~1), lambda = seq(0,10,0.1)) 
+title("Total positive")
+
+shapiro.test((dataset_pre$total_positive^6-1)/6)
+
+qqnorm((dataset_pre$total_positive^6-1)/6)
+qqline((dataset_pre$total_positive^6-1)/6)
+
+# Processed samples pre
+
+qqnorm(dataset_pre$processed_samples)
+qqline(dataset_pre$processed_samples)
+
+ks.test(dataset_pre$processed_samples,pnorm,mean(dataset_pre$processed_samples),sd(dataset_pre$processed_samples))
+shapiro.test(dataset_pre$processed_samples)
+
+boxcox(lm(dataset_pre$processed_samples~1), lambda = seq(0,1,0.1)) 
+title("Processed samples")
+
+shapiro.test((dataset_pre$processed_samples^6-1)/6)
+
+qqnorm((dataset_pre$processed_samples^6-1)/6)
+qqline((dataset_pre$processed_samples^6-1)/6)
 
