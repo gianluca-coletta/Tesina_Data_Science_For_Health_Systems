@@ -81,24 +81,30 @@ dataset$month[dataset$month == "Oct"] <- "10-October"
 dataset$month[dataset$month == "Nov"] <- "11-November"
 dataset$month[dataset$month == "Dec"] <- "12-December"
 
+# Plot of total positive
+
+dataset %>%
+  ggplot(aes(date,total_positive))+
+  geom_line(colour = "red", size = 2)+
+  scale_x_date(date_breaks = '1 year', date_labels = "%b-%Y") +
+  theme_bw()+
+  labs(title = "Positive cases", x = "Year", y = "Number of positive")
+
+# Plot of total processed samples
+
+dataset %>%
+  ggplot(aes(date,processed_samples))+
+  geom_line(colour = "red", size = 2)+
+  scale_x_date(date_breaks = '1 year', date_labels = "%b-%Y") +
+  theme_bw()+
+  labs(title = "Processed samples",x = "Year", y = "Number of processed samples")
 
 # Histogram of the ratio between number of positives and samples processed 
 
-par(mfrow=c(1,2))
-
 hist(dataset$total_positive/dataset$processed_samples,
-     main = "Istogramma", 
-     xlab ="Totale positivi / campioni processati",
-     breaks = 20)
-
-
-# Histogram of the ratio between number of negative and samples processed 
-
-hist(dataset$total_negative/dataset$processed_samples,
-          main = "Istogramma", 
-          xlab = "Totale negativi / campioni processati",
-          breaks = 15)
-
+     main = "Histogram", 
+     xlab ="Positive / Processed samples",
+     breaks = 12)
 
 # Summary statistics
 
@@ -107,97 +113,45 @@ summary(dataset)
 # Filtering based on year pre-covid and post-covid
 
 dataset_pre <- dataset[dataset$year == "2017" | dataset$year == "2018" | dataset$year == "2019", ]
-dataset_post <- dataset[dataset$year == "2020" | dataset$year == "2021", ]
+dataset_post <- dataset[dataset$year == "2020" | dataset$year == "2021" | dataset$year == "2022", ]
 
 # Plot total positive cases pre-covid
 
-total_positive_pre_year <- ggplot(data = dataset_pre,
-                             mapping= aes(x = month(date),
-                                          y = total_positive/processed_samples*100, colour = month))+
-                          geom_point(size = 3) + 
-                          geom_line(colour = "red")+
-                          facet_wrap(~year(date))+
-                          labs(title = "Andamento percentuale positivi per anno")+
-                          theme_bw()
-total_positive_pre_year 
-
-total_positive_pre_month <- ggplot(data = dataset_pre,
-                             mapping= aes(x = year,
-                                          y = total_positive/processed_samples*100))+
-  geom_point(size = 3, alpha = 0.5) + 
-  facet_wrap(~month(date))+
-  labs(title = "Andamento percentuale positivi per mese")+
+dataset_pre %>%
+  ggplot(aes(date, total_positive / processed_samples *100, group ="1")) +
+  geom_line(colour = "red", size = 1) +
+  scale_x_date(breaks= seq(min(dataset_pre$date), max(dataset_pre$date), by = "4 months"), date_labels = "%b-%Y") +
+  labs(title = "Tasso positività pre-covid", x = "Date", y = "Positivity rate") +
   theme_bw()
 
-total_positive_pre_month
 
-# Box-plot for each type of influence pre-covid
-
-# Total A
-dataset_pre %>%
-  ggplot(aes(year,total_A))+
-  geom_boxplot()+
-  theme_bw()+
-  labs(title = "Concentration of influence type-A pre-covid")
-
-# Total B
-dataset_pre %>%
-  ggplot(aes(year,total_B))+
-  geom_boxplot()+
-  theme_bw()+
-  labs(title = "Concentration of influence type-B pre-covid")
-
+dataset_pre %>% 
+ggplot(aes(x = year, y = total_positive / processed_samples *100)) +
+  geom_point(size = 3, alpha = 0.5, colour = "red") +
+  facet_wrap(~ month(date)) +
+  labs(title = "Tasso positività per mese pre covid", y = "Positivity rate") +
+  theme_bw()
 
 # Plot total positive cases post-covid
 
-total_positive_post_year <- ggplot(data = dataset_post,
-                                  mapping= aes(x = month(date),
-                                               y = total_positive/processed_samples*100, colour = month))+
-  geom_point(size = 3) + 
-  geom_line(colour = "red")+
-  facet_wrap(~year(date))+
-  labs(title = "Andamento percentuale positivi per anno")+
-  theme_bw()
-total_positive_post_year 
-
-total_positive_post_month <- ggplot(data = dataset_post,
-                                   mapping= aes(x = year,
-                                                y = total_positive/processed_samples*100))+
-  geom_point(size = 3, alpha = 0.5) + 
-  facet_wrap(~month(date))+
-  labs(title = "Andamento percentuale positivi per mese")+
+dataset_post %>%
+  ggplot(aes(date, total_positive / processed_samples *100, group ="1")) +
+  geom_line(colour = "red", size = 1) +
+  scale_x_date(breaks= seq(min(dataset_post$date), max(dataset_post$date), by = "4 months"), date_labels = "%b-%Y") +
+  labs(title = "Tasso positività post-covid", x = "Date", y = "Positivity rate") +
   theme_bw()
 
-total_positive_post_month
 
-# Box-plot for each type of influence post-covid
-
-# Total A
-dataset_post %>%
-  ggplot(aes(year,total_A))+
-  geom_boxplot()+
-  theme_bw()+
-  labs(title = "Concentration of influence type-A post-covid")
-
-# Total B
-dataset_post %>%
-  ggplot(aes(year,total_B))+
-  geom_boxplot()+
-  theme_bw()+
-  labs(title = "Concentration of influence type-B post-covid")
-
-# Total B without outlier 
-dataset_post %>%
-  filter(total_B<10000) %>%
-  ggplot(aes(year,total_B))+
-  geom_boxplot()+
-  theme_bw()+
-  labs(title = "Concentration of influence type-B post-covid")
+dataset_post %>% 
+  ggplot(aes(x = year, y = total_positive / processed_samples *100)) +
+  geom_point(size = 3, alpha = 0.5, colour = "red") +
+  facet_wrap(~ month(date)) +
+  labs(title = "Tasso positività per mese post covid", y = "Positivity rate") +
+  theme_bw()
 
 
 # Total_positive_pre_year and total_positive_post_year
-
-grid.arrange(total_positive_pre_year,total_positive_post_year,ncol=2)
+# grid.arrange(total_positive_pre_year,total_positive_post_year,ncol=2)
 
 # Plot of all know type of influence for year pre-covid and post-covid
 
@@ -207,8 +161,11 @@ dataset_pre_types <- melt(dataset_pre_types, id.vars = 'date', variable.name = '
 
 plot_type_pre <- dataset_pre_types%>%
   ggplot(aes(date, value))+
-  geom_point(size = 2)+
-  geom_line(aes(colour = type))
+  geom_line(aes(colour = type), size = 0.75)+
+  scale_x_date(breaks= seq(min(dataset_pre_types$date), max(dataset_pre_types$date), by = "6 months"), date_labels = "%m-%Y") +
+  labs(title = "Number of cases by type of influence pre covid", x = "Year", y = "Cases" )
+
+plot_type_pre
 
 
 dataset_post_types <- dataset_post[,-c(2,3,4,7,8,11,12,13,14)]
@@ -217,55 +174,55 @@ dataset_post_types <- melt(dataset_post_types, id.vars = 'date', variable.name =
 
 plot_type_post <- dataset_post_types%>%
   ggplot(aes(date, value))+
-  geom_point(size = 2)+
-  geom_line(aes(colour = type))
+  geom_line(aes(colour = type), size = 0.75)+
+  scale_x_date(breaks= seq(min(dataset_post_types$date), max(dataset_post_types$date), by = "6 months"), date_labels = "%m-%Y") +
+  labs(title = "Number of cases by type of influence post covid", x = "Date", y = "Cases" )
+plot_type_post
 
 grid.arrange(plot_type_pre,plot_type_post,ncol=2)
 
 
 
-# plot dataset_pre_types group by year
+# plot influence cases types group by year
 
-dataset_pre_types_year <- aggregate(value~year(date)+type, data=dataset_pre_types, FUN=sum) 
+dataset_types <- dataset[,-c(2,3,4,7,8,11,12,13,14)]
 
-dataset_post_types_year <- aggregate(value~year(date)+type, data=dataset_post_types, FUN=sum)
+dataset_types <- melt(dataset_types, id.vars = 'date', variable.name = 'type')
 
-colnames(dataset_pre_types_year) <- c('year','type','value')
-colnames(dataset_post_types_year) <- c('year','type','value')
+dataset_types_year <- aggregate(value~year(date)+type, data=dataset_types, FUN=sum) 
 
-plot_type_pre_year <- dataset_pre_types_year%>%
+colnames(dataset_types_year) <- c('year','type','value')
+
+plot_type_year <- dataset_types_year%>%
   ggplot(aes(year, value))+
-  geom_point(size = 2)+
-  geom_line(aes(colour = type))
+  geom_line(aes(colour = type), size = 0.75)+
+  labs(title = "Number of cases by type of influence group by year", x = "Year", y = "Cases")
+plot_type_year
 
-plot_type_post_year <- dataset_post_types_year%>%
-  ggplot(aes(year, value))+
-  geom_point(size = 2)+
-  geom_line(aes(colour = type))
-
-grid.arrange(plot_type_pre_year,plot_type_post_year,ncol=2)
 
 
 ###### TEST ######
 
-# Total positive pre
+### Normality test ###
+
+# Total positive pre covid 
 
 qqnorm(dataset_pre$total_positive)
 qqline(dataset_pre$total_positive)
 
 ks.test(dataset_pre$total_positive,pnorm,mean(dataset_pre$total_positive),sd(dataset_pre$total_positive))
-shapiro.test(dataset$total_positive)
+shapiro.test(dataset_pre$total_positive)
 
 
 boxcox(lm(dataset_pre$total_positive~1), lambda = seq(-10,10,0.1)) 
-title("Total positive")
+title("Total positive pre covid")
 
-shapiro.test((dataset_pre$total_positive^6-1)/6)
+shapiro.test(log(dataset_pre$total_positive))
 
-qqnorm((dataset_pre$total_positive^6-1)/6)
-qqline((dataset_pre$total_positive^6-1)/6)
+qqnorm(log(dataset_pre$total_positive))
+qqline(log(dataset_pre$total_positive))
 
-# Processed samples pre
+# Processed samples pre covid
 
 qqnorm(dataset_pre$processed_samples)
 qqline(dataset_pre$processed_samples)
@@ -274,10 +231,44 @@ ks.test(dataset_pre$processed_samples,pnorm,mean(dataset_pre$processed_samples),
 shapiro.test(dataset_pre$processed_samples)
 
 boxcox(lm(dataset_pre$processed_samples~1), lambda = seq(-10,10,0.1)) 
-title("Processed samples")
+title("Processed samples pre covid")
 
-shapiro.test((dataset_pre$processed_samples^6-1)/6)
+shapiro.test(log(dataset_pre$processed_samples))
 
-qqnorm((dataset_pre$processed_samples^6-1)/6)
-qqline((dataset_pre$processed_samples^6-1)/6)
+qqnorm(log(dataset_pre$processed_samples))
+qqline(log(dataset_pre$processed_samples))
+
+
+# Total positive post covid
+
+qqnorm(dataset_post$total_positive)
+qqline(dataset_post$total_positive)
+
+ks.test(dataset_post$total_positive,pnorm,mean(dataset_post$total_positive),sd(dataset_post$total_positive))
+shapiro.test(dataset_post$total_positive)
+
+
+boxcox(lm(dataset_post$total_positive~1), lambda = seq(-10,10,0.1)) 
+title("Total positive post covid")
+
+shapiro.test(log(dataset_post$total_positive))
+
+qqnorm(log(dataset_post$total_positive))
+qqline(log(dataset_post$total_positive))
+
+# Processed samples post covid
+
+qqnorm(dataset_post$processed_samples)
+qqline(dataset_post$processed_samples)
+
+ks.test(dataset_post$processed_samples,pnorm,mean(dataset_post$processed_samples),sd(dataset_post$processed_samples))
+shapiro.test(dataset_post$processed_samples)
+
+boxcox(lm(dataset_post$processed_samples~1), lambda = seq(0,5,0.01)) 
+title("Processed samples post covid")
+
+shapiro.test(((dataset_post$processed_samples^0.5)-1)/0.5)
+
+qqnorm((dataset_post$processed_samples^0.5-1)/0.5)
+qqline((dataset_post$processed_samples^0.5-1)/0.5)
 
