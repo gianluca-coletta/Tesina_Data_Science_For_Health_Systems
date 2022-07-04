@@ -68,43 +68,100 @@ dataset$month <- month.abb[as.numeric(dataset$month)]
 
 # Rename month
 
-dataset$month[dataset$month == "Jan"] <- "01-January"
-dataset$month[dataset$month == "Feb"] <- "02-February"
-dataset$month[dataset$month == "Mar"] <- "03-March"
-dataset$month[dataset$month == "Apr"] <- "04-April"
+dataset$month[dataset$month == "Jan"] <- "01-Jan"
+dataset$month[dataset$month == "Feb"] <- "02-Feb"
+dataset$month[dataset$month == "Mar"] <- "03-Mar"
+dataset$month[dataset$month == "Apr"] <- "04-Apr"
 dataset$month[dataset$month == "May"] <- "05-May"
-dataset$month[dataset$month == "Jun"] <- "06-June"
-dataset$month[dataset$month == "Jul"] <- "07-July"
-dataset$month[dataset$month == "Aug"] <- "08-August"
-dataset$month[dataset$month == "Sep"] <- "09-September"
-dataset$month[dataset$month == "Oct"] <- "10-October"
-dataset$month[dataset$month == "Nov"] <- "11-November"
-dataset$month[dataset$month == "Dec"] <- "12-December"
+dataset$month[dataset$month == "Jun"] <- "06-Jun"
+dataset$month[dataset$month == "Jul"] <- "07-Jul"
+dataset$month[dataset$month == "Aug"] <- "08-Aug"
+dataset$month[dataset$month == "Sep"] <- "09-Sep"
+dataset$month[dataset$month == "Oct"] <- "10-Oct"
+dataset$month[dataset$month == "Nov"] <- "11-Nov"
+dataset$month[dataset$month == "Dec"] <- "12-Dec"
 
 # Plot of total positive
 
 dataset %>%
   ggplot(aes(date,total_positive))+
-  geom_line(colour = "red", size = 2)+
-  scale_x_date(date_breaks = '1 year', date_labels = "%b-%Y") +
+  geom_line(colour = "red", size = 0.75)+
+  scale_x_date(breaks = seq(min(dataset$date), max(dataset$date), by = "2 months"), date_labels = "%b-%Y") +
   theme_bw()+
-  labs(title = "Positive cases", x = "Year", y = "Number of positive")
+  labs(title = "Positive cases", x = "Date", y = "Number of positive")+
+  theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))+
+  scale_y_continuous(breaks = seq(0,100000,10000),labels=scales::comma)
 
 # Plot of total processed samples
 
 dataset %>%
   ggplot(aes(date,processed_samples))+
-  geom_line(colour = "red", size = 2)+
-  scale_x_date(date_breaks = '1 year', date_labels = "%b-%Y") +
+  geom_line(colour = "red", size = 0.75)+
+  scale_x_date(breaks= seq(min(dataset$date), max(dataset$date), by = "2 months"), date_labels = "%b-%Y") +
   theme_bw()+
-  labs(title = "Processed samples",x = "Year", y = "Number of processed samples")
+  labs(title = "Processed samples",x = "Date", y = "Number of processed samples")+
+  theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))+
+  scale_y_continuous(breaks = seq(0,1000000,100000),labels = scales::comma)
 
-# Histogram of the ratio between number of positives and samples processed 
+# Histogram of number of positives and processed samples 
 
-hist(dataset$total_positive/dataset$processed_samples,
+options(scipen=999)
+par(mfrow=c(1,2))
+
+hist(dataset$total_positive,
      main = "Histogram", 
-     xlab ="Positive / Processed samples",
-     breaks = 12)
+     xlab ="Positive cases",
+     breaks = 30)
+
+
+hist(dataset$processed_samples,
+     main = "Histogram", 
+     xlab ="Processed samples",
+     breaks = 30)
+
+hist(dataset$processed_samples,
+     main = "Histogram", 
+     xlab ="Processed samples",
+     breaks = 30)
+
+
+###### TEST ######
+
+### Normality test ###
+
+# Total positive 
+
+qqnorm(dataset$total_positive)
+qqline(dataset$total_positive)
+
+shapiro.test(dataset$total_positive)
+
+
+boxcox(lm(dataset$total_positive~1), lambda = seq(-10,10,0.11)) 
+title("Total positive")
+
+shapiro.test(log(dataset$total_positive))
+
+qqnorm(log(dataset$total_positive))
+qqline(log(dataset$total_positive))
+
+# Processed samples 
+
+qqnorm(dataset$processed_samples)
+qqline(dataset$processed_samples)
+
+shapiro.test(dataset$processed_samples)
+
+
+boxcox(lm(dataset$processed_samples~1), lambda = seq(-10,10,0.11)) 
+title("Processed samples")
+
+shapiro.test(log(dataset$processed_samples))
+
+qqnorm(log(dataset$processed_samples))
+qqline(log(dataset$processed_samples))
+
+
 
 # Summary statistics
 
@@ -115,37 +172,40 @@ summary(dataset)
 dataset_pre <- dataset[dataset$year == "2017" | dataset$year == "2018" | dataset$year == "2019", ]
 dataset_post <- dataset[dataset$year == "2020" | dataset$year == "2021" | dataset$year == "2022", ]
 
-# Plot total positive cases pre-covid
+# Plot rate of total positive cases pre-covid
 
 dataset_pre %>%
   ggplot(aes(date, total_positive / processed_samples *100, group ="1")) +
   geom_line(colour = "red", size = 1) +
-  scale_x_date(breaks= seq(min(dataset_pre$date), max(dataset_pre$date), by = "4 months"), date_labels = "%b-%Y") +
+  scale_x_date(breaks= seq(min(dataset_pre$date), max(dataset_pre$date), by = "2 months"), date_labels = "%b-%Y") +
   labs(title = "Tasso positività pre-covid", x = "Date", y = "Positivity rate") +
-  theme_bw()
+  theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))+
+  scale_y_continuous(breaks = seq(0,40,5))
 
 
-dataset_pre %>% 
+
+dataset %>% 
 ggplot(aes(x = year, y = total_positive / processed_samples *100)) +
   geom_point(size = 3, alpha = 0.5, colour = "red") +
-  facet_wrap(~ month(date)) +
+  facet_wrap(~ month) +
   labs(title = "Tasso positività per mese pre covid", y = "Positivity rate") +
-  theme_bw()
+  theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))
 
-# Plot total positive cases post-covid
+# Plot rate of positive cases post-covid
 
 dataset_post %>%
   ggplot(aes(date, total_positive / processed_samples *100, group ="1")) +
   geom_line(colour = "red", size = 1) +
-  scale_x_date(breaks= seq(min(dataset_post$date), max(dataset_post$date), by = "4 months"), date_labels = "%b-%Y") +
+  scale_x_date(breaks= seq(min(dataset_post$date), max(dataset_post$date), by = "2 months"), date_labels = "%b-%Y") +
   labs(title = "Tasso positività post-covid", x = "Date", y = "Positivity rate") +
-  theme_bw()
+  theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))+
+  scale_y_continuous(breaks = seq(0,30,5))
 
 
 dataset_post %>% 
   ggplot(aes(x = year, y = total_positive / processed_samples *100)) +
   geom_point(size = 3, alpha = 0.5, colour = "red") +
-  facet_wrap(~ month(date)) +
+  facet_wrap(~ month) +
   labs(title = "Tasso positività per mese post covid", y = "Positivity rate") +
   theme_bw()
 
