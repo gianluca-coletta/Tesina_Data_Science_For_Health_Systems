@@ -202,16 +202,15 @@ dataset_post %>%
   scale_y_continuous(breaks = seq(0,30,5))
 
 
-dataset_post %>% 
+# Plot rate of positive cases for month
+
+dataset %>% 
   ggplot(aes(x = year, y = total_positive / processed_samples *100)) +
   geom_point(size = 3, alpha = 0.5, colour = "red") +
   facet_wrap(~ month) +
-  labs(title = "Tasso positività per mese post covid", y = "Positivity rate") +
-  theme_bw()
+  labs(title = "Tasso positività per ogni mese", y = "Positivity rate") +
+  theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))
 
-
-# Total_positive_pre_year and total_positive_post_year
-# grid.arrange(total_positive_pre_year,total_positive_post_year,ncol=2)
 
 # Plot of all know type of influence for year pre-covid and post-covid
 
@@ -297,38 +296,3 @@ shapiro.test(log(dataset_pre$processed_samples))
 
 qqnorm(log(dataset_pre$processed_samples))
 qqline(log(dataset_pre$processed_samples))
-
-
-# Total positive post covid
-
-qqnorm(dataset_post$total_positive)
-qqline(dataset_post$total_positive)
-
-ks.test(dataset_post$total_positive,pnorm,mean(dataset_post$total_positive),sd(dataset_post$total_positive))
-shapiro.test(dataset_post$total_positive)
-
-
-boxcox(lm(dataset_post$total_positive~1), lambda = seq(-10,10,0.1)) 
-title("Total positive post covid")
-
-shapiro.test(log(dataset_post$total_positive))
-
-qqnorm(log(dataset_post$total_positive))
-qqline(log(dataset_post$total_positive))
-
-# Processed samples post covid
-
-qqnorm(dataset_post$processed_samples)
-qqline(dataset_post$processed_samples)
-
-ks.test(dataset_post$processed_samples,pnorm,mean(dataset_post$processed_samples),sd(dataset_post$processed_samples))
-shapiro.test(dataset_post$processed_samples)
-
-boxcox(lm(dataset_post$processed_samples~1), lambda = seq(0,5,0.01)) 
-title("Processed samples post covid")
-
-shapiro.test(((dataset_post$processed_samples^0.5)-1)/0.5)
-
-qqnorm((dataset_post$processed_samples^0.5-1)/0.5)
-qqline((dataset_post$processed_samples^0.5-1)/0.5)
-
