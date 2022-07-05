@@ -266,14 +266,12 @@ plot_type_post <- dataset_post_types%>%
   labs(title = "Casi differenti tipologie di influenza post-covid", x = "Date", y = "Cases" )+
   theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))+
   scale_y_continuous(breaks = seq(0,10000,1000),labels=scales::comma)
+
 plot_type_post
 
 
 
-
-
-
-###### TEST ######
+###### ULTERIORI TEST NON USATI ######
 
 ### Normality test ###
 
