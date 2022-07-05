@@ -225,7 +225,7 @@ plot_type <- dataset_types%>%
 
 plot_type
 
-# Plot of all know type of influence for year pre-covid and post-covid
+# Plot of all know type of influence pre-covid and post-covid
 
 dataset_pre_types <- dataset_pre[,-c(2,3,4,7,8,11,12,13,14)]
 
