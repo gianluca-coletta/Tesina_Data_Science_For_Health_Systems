@@ -106,18 +106,12 @@ dataset %>%
 # Histogram of number of positives and processed samples 
 
 options(scipen=999)
-par(mfrow=c(1,2))
 
 hist(dataset$total_positive,
      main = "Histogram", 
      xlab ="Positive cases",
      breaks = 30)
 
-
-hist(dataset$processed_samples,
-     main = "Histogram", 
-     xlab ="Processed samples",
-     breaks = 30)
 
 hist(dataset$processed_samples,
      main = "Histogram", 
@@ -211,52 +205,71 @@ dataset %>%
   labs(title = "Tasso positività per ogni mese", y = "Positivity rate") +
   theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))
 
+# Plot Influence A vs Influence B
+
+dataset_types <- dataset[,-c(2,3,4,5,6,7,9,10,11,13,14)]
+
+dataset_types <- dataset_types %>%
+  rename(Influence_A = total_A,
+         Influence_B = total_B)
+
+dataset_types <- melt(dataset_types, id.vars = 'date', variable.name = 'Types')
+
+plot_type <- dataset_types%>%
+  ggplot(aes(date, value))+
+  geom_line(aes(colour = Types), size = 0.75)+
+  scale_x_date(breaks= seq(min(dataset_types$date), max(dataset_types$date), by = "3 months"), date_labels = "%b-%Y") +
+  labs(title = "Casi Influenza A vs Influenza B", x = "Date", y = "Cases")+
+  theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))+
+  scale_y_continuous(breaks = seq(0,80000,5000),labels=scales::comma)
+
+plot_type
 
 # Plot of all know type of influence for year pre-covid and post-covid
 
 dataset_pre_types <- dataset_pre[,-c(2,3,4,7,8,11,12,13,14)]
 
-dataset_pre_types <- melt(dataset_pre_types, id.vars = 'date', variable.name = 'type')
+dataset_pre_types <- dataset_pre_types %>%
+  rename(AH1N1_2009 = ah1n12009,
+         AH3 = ah3,
+         BYamagata = byamagata,
+         BVictoria = bvictoria)
+
+dataset_pre_types <- melt(dataset_pre_types, id.vars = 'date', variable.name = 'Type')
 
 plot_type_pre <- dataset_pre_types%>%
   ggplot(aes(date, value))+
-  geom_line(aes(colour = type), size = 0.75)+
-  scale_x_date(breaks= seq(min(dataset_pre_types$date), max(dataset_pre_types$date), by = "6 months"), date_labels = "%m-%Y") +
-  labs(title = "Number of cases by type of influence pre covid", x = "Year", y = "Cases" )
+  geom_line(aes(colour = Type), size = 0.75)+
+  scale_x_date(breaks= seq(min(dataset_pre_types$date), max(dataset_pre_types$date), by = "2 months"), date_labels = "%b-%Y") +
+  labs(title = "Casi differenti tipologie di influenza pre-covid", x = "Date", y = "Cases" )+ 
+  theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))+
+  scale_y_continuous(breaks = seq(0,13000,1000),labels=scales::comma)
+
 
 plot_type_pre
 
 
 dataset_post_types <- dataset_post[,-c(2,3,4,7,8,11,12,13,14)]
 
-dataset_post_types <- melt(dataset_post_types, id.vars = 'date', variable.name = 'type')
+dataset_post_types <- dataset_post_types %>%
+  rename(AH1N1_2009 = ah1n12009,
+         AH3 = ah3,
+         BYamagata = byamagata,
+         BVictoria = bvictoria)
+
+dataset_post_types <- melt(dataset_post_types, id.vars = 'date', variable.name = 'Type')
 
 plot_type_post <- dataset_post_types%>%
   ggplot(aes(date, value))+
-  geom_line(aes(colour = type), size = 0.75)+
-  scale_x_date(breaks= seq(min(dataset_post_types$date), max(dataset_post_types$date), by = "6 months"), date_labels = "%m-%Y") +
-  labs(title = "Number of cases by type of influence post covid", x = "Date", y = "Cases" )
+  geom_line(aes(colour = Type), size = 0.75)+
+  scale_x_date(breaks= seq(min(dataset_post_types$date), max(dataset_post_types$date), by = "2 months"), date_labels = "%b-%Y") +
+  labs(title = "Casi differenti tipologie di influenza post-covid", x = "Date", y = "Cases" )+
+  theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1))+
+  scale_y_continuous(breaks = seq(0,10000,1000),labels=scales::comma)
 plot_type_post
 
-grid.arrange(plot_type_pre,plot_type_post,ncol=2)
 
 
-
-# plot influence cases types group by year
-
-dataset_types <- dataset[,-c(2,3,4,7,8,11,12,13,14)]
-
-dataset_types <- melt(dataset_types, id.vars = 'date', variable.name = 'type')
-
-dataset_types_year <- aggregate(value~year(date)+type, data=dataset_types, FUN=sum) 
-
-colnames(dataset_types_year) <- c('year','type','value')
-
-plot_type_year <- dataset_types_year%>%
-  ggplot(aes(year, value))+
-  geom_line(aes(colour = type), size = 0.75)+
-  labs(title = "Number of cases by type of influence group by year", x = "Year", y = "Cases")
-plot_type_year
 
 
 
